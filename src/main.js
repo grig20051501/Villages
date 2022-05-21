@@ -1,20 +1,20 @@
 import readlineSync from 'readline-sync';
 
     let woodInStockpile = 15, stoneInStockpile = 10, ironInStockpile = 5;
-    let turn = 0;
     const woodIncome = 3, stoneIncome = 2, ironIncome = 2;
     let score = 0;
     const scoreForHouse = 100, scoreForSawmill = 10, scoreForQuarry = 20, scoreForMine = 30;
     let numOfSaws = 1, numOfQuarries = 0, numOfMines = 0, numOfHouses = 3;
     const priceOfSaw = [5, 2, 2], priceOfQuarry = [10, 5, 3], priceOfMine = [25, 20, 1], priceOfHouse = [30, 20, 10]; 
 
-const printStatus = () => {
+const printStatus = (turn) => {
+    //TODO print cost of buildings
     console.log(`turn : ${turn}     score : ${score}`);
     console.log(`wood : ${woodInStockpile}     stone : ${stoneInStockpile}  iron : ${ironInStockpile}`);
     console.log(`sawmills : ${numOfSaws}    quarries : ${numOfQuarries}     mines : ${numOfMines}   houses : ${numOfHouses}`);
     console.log(`wood income : ${woodIncome}    stone income : ${stoneIncome}   iron income : ${ironIncome}`);
 }
-//TODO: сделать строительство, подробить на функции и раскидать по файлам
+//TODO: подробить на функции и раскидать по файлам
 
 const increaseScore = (reason) => {
     //Увеличение счёта за здания
@@ -51,6 +51,7 @@ const calcPrice = (building, resource) => {
 
 const isEnough = (building) => {
     //Проверка наличия ресурсов на складе
+    //TODO message if not enough resources
     if ( building === 'Saw' ) {
         if ( calcPrice('Saw', 'wood') > woodInStockpile ) return false;
         if ( calcPrice('Saw', 'stone') > stoneInStockpile ) return false;
@@ -76,7 +77,7 @@ const isEnough = (building) => {
 
 const build = (order) => {
     // Строительство ( увеличение счёта, увеличение кол-ва зданий и уменьшение кол-ва ресов на складе )
-    if ( order == 2 ) {
+    if ( order == 1 ) {
         if ( isEnough('Saw') ) {
             increaseScore('Saw'); numOfSaws += 1;
             woodInStockpile -= calcPrice('Saw', 'wood');
@@ -84,7 +85,7 @@ const build = (order) => {
             ironInStockpile -= calcPrice('Saw', 'iron');
         }
     }
-    if ( order == 3 ) {
+    if ( order == 2 ) {
         if ( isEnough('Quarry') ) {
             increaseScore('Quarry'); numOfQuarries += 1;
             woodInStockpile -= calcPrice('Quarry', 'wood');
@@ -92,7 +93,7 @@ const build = (order) => {
             ironInStockpile -= calcPrice('Quarry', 'iron');
         }
     }
-    if ( order == 4 ) {
+    if ( order == 3 ) {
         if ( isEnough('Mine') ) {
             increaseScore('Mine'); numOfMines += 1;
             woodInStockpile -= calcPrice('Mine', 'wood');
@@ -100,7 +101,7 @@ const build = (order) => {
             ironInStockpile -= calcPrice('Mine', 'iron');
         }
     }
-    if ( order == 5 ) {
+    if ( order == 4 ) {
         if ( isEnough('House') ) {
             increaseScore('House'); numOfHouses += 1;
             woodInStockpile -= calcPrice('House', 'wood');
@@ -108,21 +109,32 @@ const build = (order) => {
             ironInStockpile -= calcPrice('House', 'iron');
         }
     }
+    printStatus();
+}
+
+const nextTurn = () => {
+    woodInStockpile += woodIncome * numOfSaws;
+    stoneInStockpile += stoneIncome * numOfQuarries;
+    ironInStockpile += ironIncome * numOfMines;
 }
 
 const action = (order) => {
     //Основная функция обработки действий игрока
-    if ( order == 1 ) printStatus();
+    
     //TODO accomplish actions with buildings and nextTurn()
 }
 const game = () => {
-    let i = 0 ; 
-    while ( i < 20 ) {
+    let turn = 0 ; 
+    console.log('press q to exit');
+    while ( turn < 20 ) {
         console.log('What should we do, sir?');
-        console.log('1 : status     2 : build a sawmill   3 : build a quarry    4 : build a mine    5 : build a house   6 : next turn');
+        console.log('1 : build a sawmill   2 : build a quarry    3 : build a mine    4 : build a house   5 : next turn');
+        printStatus(turn);
         const answer = readlineSync.question();
-        if ( answer == 6 ) { i += 1 };
-        //TODO nextTurn()
+        if ( answer == 5 ) { turn += 1; nextTurn(); }
+        else if ( answer != 'q' ) build(answer)
+        else break;
     }
 }
 //TODO play the game()
+game();
