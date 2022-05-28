@@ -5,15 +5,15 @@ import readlineSync from 'readline-sync';
     const woodIncome = 3, stoneIncome = 2, ironIncome = 2;
     let score = 0;
     const scoreForHouse = 100, scoreForSawmill = 10, scoreForQuarry = 20, scoreForMine = 30;
-    let numOfSaws = 1, numOfQuarries = 0, numOfMines = 0, numOfHouses = 3;
+    let numOfSaws = 1, numOfQuarries = 1, numOfMines = 1, numOfHouses = 0;
     const priceOfSaw = [5, 2, 2], priceOfQuarry = [10, 5, 3], priceOfMine = [25, 20, 1], priceOfHouse = [30, 20, 10]; 
 
 const printStatus = (turn) => {
     //TODO print cost of buildings
-    console.log(`turn : ${turn}     score : ${score}`);
-    console.log(`wood : ${woodInStockpile}     stone : ${stoneInStockpile}  iron : ${ironInStockpile}`);
-    console.log(`sawmills : ${numOfSaws}    quarries : ${numOfQuarries}     mines : ${numOfMines}   houses : ${numOfHouses}`);
-    console.log(`wood income : ${woodIncome}    stone income : ${stoneIncome}   iron income : ${ironIncome}`);
+    console.log(`ход : ${turn}     счёт : ${score}`);
+    console.log(`дрова : ${woodInStockpile}     камешки : ${stoneInStockpile}  железяки : ${ironInStockpile}`);
+    console.log(`лесопилки : ${numOfSaws}    карики : ${numOfQuarries}     шахтОчки : ${numOfMines}   хатики : ${numOfHouses}`);
+    console.log(`дров в ход : ${woodIncome}   камешков в ход : ${stoneIncome}   гвоздей в ход : ${ironIncome}`);
 }
 //TODO: подробить на функции и раскидать по файлам
 
@@ -54,24 +54,24 @@ const isEnough = (building) => {
     //Проверка наличия ресурсов на складе
     //TODO message if not enough resources
     if ( building === 'Saw' ) {
-        if ( calcPrice('Saw', 'wood') > woodInStockpile ) return false;
-        if ( calcPrice('Saw', 'stone') > stoneInStockpile ) return false;
-        if ( calcPrice('Saw', 'iron') > ironInStockpile ) return false;
+        if ( calcPrice('Saw', 'wood') - woodInStockpile > 0 ) return false;
+        if ( calcPrice('Saw', 'stone') - stoneInStockpile > 0  ) return false;
+        if ( calcPrice('Saw', 'iron') - ironInStockpile > 0 ) return false;
     } 
     if ( building === 'Quarry' ) {
-        if ( calcPrice('Quarry', 'wood') > woodInStockpile ) return false;
-        if ( calcPrice('Quarry', 'stone') > stoneInStockpile ) return false;
-        if ( calcPrice('Quarry', 'iron') > ironInStockpile ) return false;
+        if ( calcPrice('Quarry', 'wood') - woodInStockpile > 0 ) return false;
+        if ( calcPrice('Quarry', 'stone') - stoneInStockpile > 0 ) return false;
+        if ( calcPrice('Quarry', 'iron') - ironInStockpile > 0 ) return false;
     } 
     if ( building === 'Mine' ) {
-        if ( calcPrice('Mine', 'wood') > woodInStockpile ) return false;
-        if ( calcPrice('Mine', 'stone') > stoneInStockpile ) return false;
-        if ( calcPrice('Mine', 'iron') > ironInStockpile ) return false;
+        if ( calcPrice('Mine', 'wood') - woodInStockpile > 0 ) return false;
+        if ( calcPrice('Mine', 'stone') - stoneInStockpile > 0 ) return false;
+        if ( calcPrice('Mine', 'iron') - ironInStockpile > 0 ) return false;
     } 
     if ( building === 'House' ) {
-        if ( calcPrice('House', 'wood') > woodInStockpile ) return false;
-        if ( calcPrice('House', 'stone') > stoneInStockpile ) return false;
-        if ( calcPrice('House', 'iron') > ironInStockpile ) return false;
+        if ( calcPrice('House', 'wood') - woodInStockpile > 0 ) return false;
+        if ( calcPrice('House', 'stone') - stoneInStockpile > 0 ) return false;
+        if ( calcPrice('House', 'iron') - ironInStockpile > 0 ) return false;
     } 
     return true;
 }
@@ -82,7 +82,7 @@ const build = (order) => {
         if ( isEnough('Saw') ) {
             increaseScore('Saw'); numOfSaws += 1;
             woodInStockpile -= calcPrice('Saw', 'wood');
-            stoneInStockpile -= calcPrice('Saw', 'wood');
+            stoneInStockpile -= calcPrice('Saw', 'stone');
             ironInStockpile -= calcPrice('Saw', 'iron');
         }
     }
@@ -110,10 +110,10 @@ const build = (order) => {
             ironInStockpile -= calcPrice('House', 'iron');
         }
     }
-    printStatus();
 }
 
 const nextTurn = () => {
+    // Функция подсчёта инкама ресурсов
     woodInStockpile += woodIncome * numOfSaws;
     stoneInStockpile += stoneIncome * numOfQuarries;
     ironInStockpile += ironIncome * numOfMines;
@@ -126,16 +126,17 @@ const action = (order) => {
 }
 const game = () => {
     let turn = 0 ; 
-    console.log('press q to exit');
+    console.log('Тыкай q чтобы выйти');
     while ( turn < 20 ) {
-        console.log('What should we do, sir?');
-        console.log('1 : build a sawmill   2 : build a quarry    3 : build a mine    4 : build a house   5 : next turn');
+        console.log('Шо рабить?');
         printStatus(turn);
+        console.log('1 : строить лесопилку   2 : строить карик    3 : строить шахточку    4 : строить хату   5 : следующий ход');
         const answer = readlineSync.question();
         if ( answer == 5 ) { turn += 1; nextTurn(); }
         else if ( answer != 'q' ) build(answer)
         else break;
     }
+    console.log(`Время вышло. Твой счёт = ${score}`);
 }
 //TODO play the game()
 game();
